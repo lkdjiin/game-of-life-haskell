@@ -5,6 +5,8 @@ This code is made to support a serie of blog posts I wrote in french.
 - [Le jeu de la vie dans 7 langages différents](http://lkdjiin.github.io/blog/2014/10/08/le-jeu-de-la-vie-dans-sept-langages-differents/)
 - [Haskell - partie 1](http://lkdjiin.github.io/blog/2014/12/28/le-jeu-de-la-vie-en-haskell-partie-1/)
 - [Haskell - partie 2](http://lkdjiin.github.io/blog/2014/12/29/le-jeu-de-la-vie-en-haskell-partie-2/)
+- [Haskell - partie 3](http://lkdjiin.github.io/blog/2014/12/30/le-jeu-de-la-vie-en-haskell-partie-3/)
+- [Haskell - partie 4](http://lkdjiin.github.io/blog/2014/12/30/le-jeu-de-la-vie-en-haskell-partie-4/)
 
 ## Installation
 
