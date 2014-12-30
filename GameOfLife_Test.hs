@@ -1,6 +1,6 @@
 module GameOfLife_Test where
 
-import GameOfLife(cellNextState, extractNeighborhood)
+import GameOfLife(cellNextState, extractNeighborhood, nextGeneration)
 import Test.HUnit
 
 cellNextStateTests = TestList [testCellNextState3,
@@ -58,4 +58,17 @@ testExtractTopLeft = TestCase $ assertEqual
   "Gets the neighborhood when fetching top left"
   [1,2,5,6] (extractNeighborhood generation 0 0)
 
-main = runTestTT $ TestList [cellNextStateTests, extractTests]
+nextGenTests = TestList [testNextGeneration]
+generation0 = [[1,0,0,0],
+               [0,1,1,0],
+               [1,0,1,0]]
+
+generation1 = [[0,1,0,0],
+               [1,0,1,0],
+               [0,0,1,0]]
+
+testNextGeneration = TestCase $ assertEqual
+  "Gets the next generation"
+  generation1 (nextGeneration generation0)
+
+main = runTestTT $ TestList [cellNextStateTests, extractTests, nextGenTests]

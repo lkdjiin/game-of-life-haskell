@@ -1,9 +1,10 @@
 module GameOfLife
 ( randomCells
 , createGeneration
-, formatGeneration
+, displayGeneration
 , cellNextState
 , extractNeighborhood
+, nextGeneration
 ) where
 
 import System.Random
@@ -14,7 +15,7 @@ type Cell = Int
 type Generation = [[Cell]]
 
 randomCells :: Int -> StdGen -> [Cell]
-randomCells size gen = take size $ randomRs (0, 1) gen
+randomCells size generation = take size $ randomRs (0, 1) generation
 
 createGeneration :: Int -> [Cell] -> Generation
 createGeneration _ [] = []
@@ -25,6 +26,9 @@ formatGeneration :: Generation -> String
 formatGeneration generation =
   let rows = intercalate "\n" (map (concatMap show) generation)
    in map replaceChar rows
+
+displayGeneration :: Generation -> IO()
+displayGeneration generation = putStrLn $ formatGeneration generation
 
 replaceChar :: Char -> Char
 replaceChar '1' = '@'
@@ -47,3 +51,17 @@ extractNeighborhood generation row column
           row1 = getRow row
           row2 = getRow $ row + 1
           getRow r = sliceAround column $ generation !! r
+
+nextGeneration :: Generation -> Generation
+nextGeneration generation = [(nextRow y generation) | y <- [0..height]]
+  where height = (length generation) - 1
+
+nextRow :: Int -> Generation -> [Cell]
+nextRow y generation = [(nextCell y x generation) | x <- [0..width]]
+  where row = generation !! y
+        width = (length row) - 1
+
+nextCell :: Int -> Int -> Generation -> Cell
+nextCell y x generation = cellNextState cell neighborhood
+  where neighborhood = extractNeighborhood generation y x
+        cell = (generation !! y) !! x
