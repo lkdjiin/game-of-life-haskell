@@ -3,10 +3,12 @@ module GameOfLife
 , createGeneration
 , formatGeneration
 , cellNextState
+, extractNeighborhood
 ) where
 
 import System.Random
 import Data.List
+import Slice
 
 type Cell = Int
 type Generation = [[Cell]]
@@ -37,4 +39,11 @@ cellNextState cell neighborhood
     where total = sum neighborhood
 
 extractNeighborhood :: Generation -> Int -> Int -> [Cell]
-extractNeighborhood generation row column = undefined
+extractNeighborhood generation row column
+  | row == 0 = row1 ++ row2
+  | row == (length generation) - 1 = row0 ++ row1
+  | otherwise = row0 ++ row1 ++ row2
+    where row0 = getRow $ row - 1
+          row1 = getRow row
+          row2 = getRow $ row + 1
+          getRow r = sliceAround column $ generation !! r
