@@ -4,7 +4,7 @@ import Control.Concurrent
 import qualified Data.Map as M
 
 displayGrid :: Grid -> IO()
-displayGrid grid = putStrLn $ formatGrid grid
+displayGrid = putStrLn . formatGrid
 
 formatGrid :: Grid -> String
 formatGrid = map replaceChar . fst . M.foldlWithKey reducer ("", -1)
@@ -18,7 +18,7 @@ replaceChar '0' = ' '
 replaceChar c   = c
 
 randomCells :: Int -> StdGen -> [Cell]
-randomCells size grid = take size $ randomRs (0, 1) grid
+randomCells size = take size . randomRs (0, 1)
 
 loop 0 _ = return ()
 loop n g =
@@ -29,8 +29,8 @@ loop n g =
 
 main :: IO()
 main =
-  let width = 3
-      height = 3
+  let width = 80
+      height = 23
       cells = randomCells (width * height) (mkStdGen 1234)
       grid = createGrid width cells
    in loop 40 grid

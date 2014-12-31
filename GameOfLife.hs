@@ -29,4 +29,5 @@ extractNeighborhood grid row column = mapMaybe (flip M.lookup grid) neighboursPo
 
 nextGeneration :: Grid -> Grid
 nextGeneration grid = M.mapWithKey evolve grid
-  where evolve (x, y) v = cellNextState v $ sum (extractNeighborhood grid x y)
+  where evolve p v = cellNextState v $ countAliveNeighbours p
+        countAliveNeighbours (x, y) = sum $ extractNeighborhood grid x y
