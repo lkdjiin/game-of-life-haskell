@@ -9,7 +9,6 @@ module GameOfLife
 
 import qualified Data.Map as M
 import Data.Maybe(mapMaybe)
-import Slice
 
 type Cell = Int
 type Pos = (Int, Int)
