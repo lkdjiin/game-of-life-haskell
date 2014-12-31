@@ -1,15 +1,16 @@
 import System.Random
 import GameOfLife
 import Control.Concurrent
-import Data.List (intercalate)
+import qualified Data.Map as M
 
 displayGrid :: Grid -> IO()
 displayGrid grid = putStrLn $ formatGrid grid
 
 formatGrid :: Grid -> String
-formatGrid grid =
-  let rows = intercalate "\n" (map (concatMap show) grid)
-   in map replaceChar rows
+formatGrid = map replaceChar . fst . M.foldlWithKey reducer ("", -1)
+  where reducer (acc, l) (x, _) v = if x == l
+                                    then (show v ++ acc, l)
+                                    else (show v ++ "\n" ++ acc, x)
 
 replaceChar :: Char -> Char
 replaceChar '1' = '@'
@@ -24,12 +25,12 @@ loop n g =
  do
    displayGrid g
    threadDelay 1000000
-   loop (n-1) (nextGrid g)
+   loop (n-1) (nextGeneration g)
 
 main :: IO()
 main =
-  let width = 80
-      height = 23
+  let width = 3
+      height = 3
       cells = randomCells (width * height) (mkStdGen 1234)
       grid = createGrid width cells
    in loop 40 grid

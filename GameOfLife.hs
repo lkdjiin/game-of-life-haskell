@@ -2,46 +2,32 @@ module GameOfLife
 ( createGrid
 , cellNextState
 , extractNeighborhood
-, nextGrid
+, nextGeneration
 , Grid
 , Cell
 ) where
 
+import qualified Data.Map as M
+import Data.Maybe(mapMaybe)
 import Slice
 
 type Cell = Int
-type Grid = [[Cell]]
+type Pos = (Int, Int)
+type Grid = M.Map Pos Cell
 
 createGrid :: Int -> [Cell] -> Grid
-createGrid _ [] = []
-createGrid width cells = line:(createGrid width rest)
-  where (line, rest) = splitAt width cells
+createGrid width = M.fromList . zip cellsPos
+  where cellsPos = [(x-1, y-1) | x <- [1..width], y <- [1..width]]
 
 cellNextState :: Cell -> Int -> Cell
-cellNextState cell 4 = cell
+cellNextState cell 2 = cell
 cellNextState _    3 = 1
 cellNextState _    _ = 0
 
 extractNeighborhood :: Grid -> Int -> Int -> [Cell]
-extractNeighborhood generation row column
-  | row == 0 = row1 ++ row2
-  | row == (length generation) - 1 = row0 ++ row1
-  | otherwise = row0 ++ row1 ++ row2
-    where row0 = getRow $ row - 1
-          row1 = getRow row
-          row2 = getRow $ row + 1
-          getRow r = sliceAround column $ generation !! r
+extractNeighborhood grid row column = mapMaybe (flip M.lookup grid) neighboursPos
+  where neighboursPos = [ (row + x, column + y) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0]
 
-nextGrid :: Grid -> Grid
-nextGrid generation = [(nextRow y generation) | y <- [0..height]]
-  where height = (length generation) - 1
-
-nextRow :: Int -> Grid -> [Cell]
-nextRow y generation = [(nextCell y x generation) | x <- [0..width]]
-  where row = generation !! y
-        width = (length row) - 1
-
-nextCell :: Int -> Int -> Grid -> Cell
-nextCell y x generation = cellNextState cell aliveNegbours
-  where aliveNegbours = sum $ extractNeighborhood generation y x
-        cell = (generation !! y) !! x
+nextGeneration :: Grid -> Grid
+nextGeneration grid = M.mapWithKey evolve grid
+  where evolve (x, y) v = cellNextState v $ sum (extractNeighborhood grid x y)
