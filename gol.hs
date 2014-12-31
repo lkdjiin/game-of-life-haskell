@@ -2,6 +2,7 @@ import System.Random
 import GameOfLife
 import Control.Concurrent
 import qualified Data.Map as M
+import Control.Monad (forM_)
 
 displayGrid :: Grid -> IO()
 displayGrid = putStrLn . formatGrid
@@ -20,17 +21,12 @@ replaceChar c   = c
 randomCells :: Int -> StdGen -> [Cell]
 randomCells size = take size . randomRs (0, 1)
 
-loop 0 _ = return ()
-loop n g =
- do
-   displayGrid g
-   threadDelay 1000000
-   loop (n-1) (nextGeneration g)
-
 main :: IO()
 main =
   let width = 80
       height = 23
       cells = randomCells (width * height) (mkStdGen 1234)
       grid = createGrid width cells
-   in loop 40 grid
+   in forM_ (take 40 $ iterate nextGeneration grid) $ \g -> do
+                                                         displayGrid g
+                                                         threadDelay 1000000
