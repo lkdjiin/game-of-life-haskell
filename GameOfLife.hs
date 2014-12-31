@@ -1,39 +1,21 @@
 module GameOfLife
-( randomCells
-, createGeneration
-, displayGeneration
+( createGeneration
 , cellNextState
 , extractNeighborhood
 , nextGeneration
+, Generation
+, Cell
 ) where
 
-import System.Random
-import Data.List
 import Slice
 
 type Cell = Int
 type Generation = [[Cell]]
 
-randomCells :: Int -> StdGen -> [Cell]
-randomCells size generation = take size $ randomRs (0, 1) generation
-
 createGeneration :: Int -> [Cell] -> Generation
 createGeneration _ [] = []
 createGeneration width cells = line:(createGeneration width rest)
   where (line, rest) = splitAt width cells
-
-formatGeneration :: Generation -> String
-formatGeneration generation =
-  let rows = intercalate "\n" (map (concatMap show) generation)
-   in map replaceChar rows
-
-displayGeneration :: Generation -> IO()
-displayGeneration generation = putStrLn $ formatGeneration generation
-
-replaceChar :: Char -> Char
-replaceChar '1' = '@'
-replaceChar '0' = ' '
-replaceChar c   = c
 
 cellNextState :: Cell -> [Cell] -> Cell
 cellNextState cell neighborhood
