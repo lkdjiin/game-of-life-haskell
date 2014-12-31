@@ -9,20 +9,20 @@ cellNextStateTests = TestList [testCellNextState3,
                                testCellNextState6]
 
 testCellNextState3 = TestCase $ assertEqual
-  "Gets 1 when neighborhood's sum is 3"
-  1 (cellNextState 0 [1,1,1,0])
+  "Given dead cell when 3 alive neighbours then come to life"
+  1 (cellNextState 0 3)
 
 testCellNextState4AndAlive = TestCase $ assertEqual
-  "Gets 1 when neighborhood's sum is 4 and cell is alive"
-  1 (cellNextState 1 [1,1,1,0,1])
+  "Given alive cell when 4 alive neighbours then stay alive"
+  1 (cellNextState 1 4)
 
 testCellNextState4AndDead = TestCase $ assertEqual
-  "Gets 0 when neighborhood's sum is 4 and cell is dead"
-  0 (cellNextState 0 [1,1,1,0,1])
+  "Given dead cell when 4 alive neighbours then stay dead"
+  0 (cellNextState 0 4)
 
 testCellNextState6 = TestCase $ assertEqual
-  "Gets 0 when neighborhood's sum is 6"
-  0 (cellNextState 1 [1,1,1,0,1,1,1])
+  "Given dead cell when 6 alive neighbours then stay dead"
+  0 (cellNextState 1 6)
 
 extractTests = TestList [testExtractSimpleCase,
                         testExtractLeft,

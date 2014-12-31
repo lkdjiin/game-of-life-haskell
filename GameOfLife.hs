@@ -17,12 +17,10 @@ createGeneration _ [] = []
 createGeneration width cells = line:(createGeneration width rest)
   where (line, rest) = splitAt width cells
 
-cellNextState :: Cell -> [Cell] -> Cell
-cellNextState cell neighborhood
-  | total == 4 = cell
-  | total == 3 = 1
-  | otherwise = 0
-    where total = sum neighborhood
+cellNextState :: Cell -> Int -> Cell
+cellNextState cell 4 = cell
+cellNextState _    3 = 1
+cellNextState _    _ = 0
 
 extractNeighborhood :: Generation -> Int -> Int -> [Cell]
 extractNeighborhood generation row column
@@ -44,6 +42,6 @@ nextRow y generation = [(nextCell y x generation) | x <- [0..width]]
         width = (length row) - 1
 
 nextCell :: Int -> Int -> Generation -> Cell
-nextCell y x generation = cellNextState cell neighborhood
-  where neighborhood = extractNeighborhood generation y x
+nextCell y x generation = cellNextState cell aliveNegbours
+  where aliveNegbours = sum $ extractNeighborhood generation y x
         cell = (generation !! y) !! x
