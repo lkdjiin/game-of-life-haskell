@@ -1,18 +1,23 @@
 module GameOfLife
 ( createGrid
 , cellNextState
-, extractNeighborhood
+, countAliveNeighbours
 , nextGeneration
 , Grid
-, Cell
+, Cell(..)
+, isAlive
 ) where
 
 import qualified Data.Map as M
 import Data.Maybe(mapMaybe)
 
-type Cell = Int
+data Cell = Alive | Dead deriving (Show, Eq, Enum)
 type Pos = (Int, Int)
 type Grid = M.Map Pos Cell
+
+isAlive :: Cell -> Bool
+isAlive Alive = True
+isAlive _     = False
 
 createGrid :: Int -> [Cell] -> Grid
 createGrid width = M.fromList . zip cellsPos
@@ -20,14 +25,13 @@ createGrid width = M.fromList . zip cellsPos
 
 cellNextState :: Cell -> Int -> Cell
 cellNextState cell 2 = cell
-cellNextState _    3 = 1
-cellNextState _    _ = 0
+cellNextState _    3 = Alive
+cellNextState _    _ = Dead
 
-extractNeighborhood :: Grid -> Int -> Int -> [Cell]
-extractNeighborhood grid row column = mapMaybe (flip M.lookup grid) neighboursPos
+countAliveNeighbours :: Grid -> Int -> Int -> Int
+countAliveNeighbours grid row column = length $ filter isAlive $ mapMaybe (flip M.lookup grid) neighboursPos
   where neighboursPos = [ (row + x, column + y) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0]
 
 nextGeneration :: Grid -> Grid
-nextGeneration grid = M.mapWithKey evolve grid
-  where evolve p v = cellNextState v $ countAliveNeighbours p
-        countAliveNeighbours (x, y) = sum $ extractNeighborhood grid x y
+nextGeneration grid = M.mapWithKey (flip evolve) grid
+  where evolve v = cellNextState v . uncurry (countAliveNeighbours grid)

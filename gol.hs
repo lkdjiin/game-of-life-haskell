@@ -15,11 +15,21 @@ formatGrid = intercalate "\n" . map displayLine . groupByLine . M.toList
         displayLine = map (displayCell . snd)
 
 displayCell :: Cell -> Char
-displayCell 1 = '@'
-displayCell 0 = ' '
+displayCell Alive = '@'
+displayCell Dead = ' '
+
+
+instance Random Cell where
+    randomR (a,b) = mapFst bool2Cell . randomR (isAlive a, isAlive b)
+      where
+        bool2Cell False = Dead
+        bool2Cell True  = Alive
+        mapFst f (x, y) = (f x, y)
+
+    random = randomR (Dead, Alive)
 
 randomCells :: StdGen -> [Cell]
-randomCells = randomRs (0, 1)
+randomCells = randoms
 
 main :: IO()
 main =
