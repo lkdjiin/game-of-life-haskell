@@ -5,7 +5,7 @@ import qualified Data.Map as M
 import Control.Monad (forM_)
 import Data.Function(on)
 import Data.List(groupBy, intercalate)
-import Control.Arrow((&&&))
+import Control.Arrow((&&&), (***))
 
 displayGrid :: Grid -> IO()
 displayGrid = putStrLn . formatGrid
@@ -21,7 +21,7 @@ displayCell Dead = ' '
 
 
 instance Random Cell where
-    randomR (a,b) = (bool2Cell . fst &&& snd) . randomR (isAlive a, isAlive b)
+    randomR r = (bool2Cell . fst &&& snd) . randomR (isAlive *** isAlive $ r)
       where
         bool2Cell False = Dead
         bool2Cell True  = Alive
