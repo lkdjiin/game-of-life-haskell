@@ -1,6 +1,6 @@
 module GameOfLife_Test where
 
-import GameOfLife(cellNextState, countAliveNeighbours, nextGeneration, createGrid, Cell(..))
+import GameOfLife
 import Test.HUnit
 
 cellNextStateTests = TestList [testCellNextState3,
@@ -36,27 +36,27 @@ generation = createGrid 4 [Alive, Dead, Alive, Dead,
 
 testExtractSimpleCase = TestCase $ assertEqual
   "Gets the number of alive neighbours in a complete neighborhood"
-  3 (countAliveNeighbours generation 1 1)
+  3 (countAliveNeighbours generation (Pos 1 1))
 
 testExtractLeft = TestCase $ assertEqual
   "Gets the number of alive neighbours when fetching left"
-  3 (countAliveNeighbours generation 1 0)
+  3 (countAliveNeighbours generation (Pos 1 0))
 
 testExtractRight = TestCase $ assertEqual
   "Gets the number of alive neighbours when fetching right"
-  2 (countAliveNeighbours generation 1 3)
+  2 (countAliveNeighbours generation (Pos 1 3))
 
 testExtractTop = TestCase $ assertEqual
   "Gets the number of alive neighbours when fetching top"
-  3 (countAliveNeighbours generation 0 1)
+  3 (countAliveNeighbours generation (Pos 0 1))
 
 testExtractBottom = TestCase $ assertEqual
   "Gets the number of alive neighbours when fetching bottom"
-  2 (countAliveNeighbours generation 2 1)
+  2 (countAliveNeighbours generation (Pos 2 1))
 
 testExtractTopLeft = TestCase $ assertEqual
   "Gets the number of alive neighbours when fetching top left"
-  1 (countAliveNeighbours generation 0 0)
+  1 (countAliveNeighbours generation (Pos 0 0))
 
 nextGenTests = TestList [testNextGrid]
 generation0 = createGrid 4 [Alive, Dead, Dead, Dead,

@@ -11,7 +11,7 @@ displayGrid = putStrLn . formatGrid
 
 formatGrid :: Grid -> String
 formatGrid = intercalate "\n" . map displayLine . groupByLine . M.toList
-  where groupByLine = groupBy ((==) `on` (fst . fst))
+  where groupByLine = groupBy ((==) `on` (getX . fst))
         displayLine = map (displayCell . snd)
 
 displayCell :: Cell -> Char
