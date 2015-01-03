@@ -24,8 +24,7 @@ displayCell cell = case cell of
 instance Random Cell where
     randomR r = (bool2Cell . fst &&& snd) . randomR (isAlive *** isAlive $ r)
       where
-        bool2Cell False = Dead
-        bool2Cell True  = Alive
+        bool2Cell s = if s then Alive else Dead
 
     random = randomR (Dead, Alive)
 
