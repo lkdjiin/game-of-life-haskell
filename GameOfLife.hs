@@ -17,8 +17,7 @@ data Pos = Pos { getX :: Int, getY :: Int } deriving (Show, Eq)
 type Grid = M.Map Pos Cell
 
 isAlive :: Cell -> Bool
-isAlive Alive = True
-isAlive _     = False
+isAlive = (== Alive)
 
 instance Ord Pos where
     compare (Pos x y) (Pos x' y') = case compare x x' of
@@ -30,9 +29,10 @@ createGrid width = M.fromList . zip cellsPos
   where cellsPos = [Pos (x-1) (y-1) | x <- [1..width], y <- [1..width]]
 
 cellNextState :: Cell -> Int -> Cell
-cellNextState cell 2 = cell
-cellNextState _    3 = Alive
-cellNextState _    _ = Dead
+cellNextState cell n = case n of
+                         2 -> cell
+                         3 -> Alive
+                         _ -> Dead
 
 countAliveNeighbours :: Grid -> Pos -> Int
 countAliveNeighbours grid pos = length $ filter isAlive $ mapMaybe (flip M.lookup grid) neighboursPos

@@ -7,7 +7,7 @@ import Data.Function(on)
 import Data.List(groupBy, intercalate)
 import Control.Arrow((&&&), (***))
 
-displayGrid :: Grid -> IO()
+displayGrid :: Grid -> IO ()
 displayGrid = putStrLn . formatGrid
 
 formatGrid :: Grid -> String
@@ -16,8 +16,9 @@ formatGrid = intercalate "\n" . map displayLine . groupByLine . M.toList
         displayLine = map (displayCell . snd)
 
 displayCell :: Cell -> Char
-displayCell Alive = '@'
-displayCell Dead = ' '
+displayCell cell = case cell of
+                     Alive -> '@'
+                     Dead -> ' '
 
 
 instance Random Cell where
