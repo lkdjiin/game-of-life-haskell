@@ -1,67 +1,43 @@
 module GameOfLife
-( randomCells
-, createGeneration
-, displayGeneration
+( createGrid
 , cellNextState
-, extractNeighborhood
+, countAliveNeighbours
 , nextGeneration
+, Grid
+, Cell(..)
+, Pos(..)
+, isAlive
 ) where
 
-import System.Random
-import Data.List
-import Slice
+import qualified Data.Map as M
+import Data.Maybe(mapMaybe)
 
-type Cell = Int
-type Generation = [[Cell]]
+data Cell = Alive | Dead deriving (Show, Eq, Enum)
+data Pos = Pos { getX :: Int, getY :: Int } deriving (Show, Eq)
+type Grid = M.Map Pos Cell
 
-randomCells :: Int -> StdGen -> [Cell]
-randomCells size generation = take size $ randomRs (0, 1) generation
+isAlive :: Cell -> Bool
+isAlive = (== Alive)
 
-createGeneration :: Int -> [Cell] -> Generation
-createGeneration _ [] = []
-createGeneration width cells = line:(createGeneration width rest)
-  where (line, rest) = splitAt width cells
+instance Ord Pos where
+    compare (Pos x y) (Pos x' y') = case compare x x' of
+                                      EQ -> compare y y'
+                                      r -> r
 
-formatGeneration :: Generation -> String
-formatGeneration generation =
-  let rows = intercalate "\n" (map (concatMap show) generation)
-   in map replaceChar rows
+createGrid :: Int -> [Cell] -> Grid
+createGrid width = M.fromList . zip cellsPos
+  where cellsPos = [Pos (x-1) (y-1) | x <- [1..width], y <- [1..width]]
 
-displayGeneration :: Generation -> IO()
-displayGeneration generation = putStrLn $ formatGeneration generation
+cellNextState :: Cell -> Int -> Cell
+cellNextState cell n = case n of
+                         2 -> cell
+                         3 -> Alive
+                         _ -> Dead
 
-replaceChar :: Char -> Char
-replaceChar '1' = '@'
-replaceChar '0' = ' '
-replaceChar c   = c
+countAliveNeighbours :: Grid -> Pos -> Int
+countAliveNeighbours grid pos = length $ filter isAlive $ mapMaybe (flip M.lookup grid) neighboursPos
+  where neighboursPos = [ Pos (x + getX pos) (y + getY pos) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0]
 
-cellNextState :: Cell -> [Cell] -> Cell
-cellNextState cell neighborhood
-  | total == 4 = cell
-  | total == 3 = 1
-  | otherwise = 0
-    where total = sum neighborhood
-
-extractNeighborhood :: Generation -> Int -> Int -> [Cell]
-extractNeighborhood generation row column
-  | row == 0 = row1 ++ row2
-  | row == (length generation) - 1 = row0 ++ row1
-  | otherwise = row0 ++ row1 ++ row2
-    where row0 = getRow $ row - 1
-          row1 = getRow row
-          row2 = getRow $ row + 1
-          getRow r = sliceAround column $ generation !! r
-
-nextGeneration :: Generation -> Generation
-nextGeneration generation = [(nextRow y generation) | y <- [0..height]]
-  where height = (length generation) - 1
-
-nextRow :: Int -> Generation -> [Cell]
-nextRow y generation = [(nextCell y x generation) | x <- [0..width]]
-  where row = generation !! y
-        width = (length row) - 1
-
-nextCell :: Int -> Int -> Generation -> Cell
-nextCell y x generation = cellNextState cell neighborhood
-  where neighborhood = extractNeighborhood generation y x
-        cell = (generation !! y) !! x
+nextGeneration :: Grid -> Grid
+nextGeneration grid = M.mapWithKey (flip evolve) grid
+  where evolve v = cellNextState v . countAliveNeighbours grid
